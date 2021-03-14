@@ -64,7 +64,7 @@ copy $(SolutionDir)\$(SolutionName)\Info.json "$(DVInstallPath)Mods\$(SolutionNa
 
 if $(Configuration) == Release (
   mkdir "$(SolutionDir)bld\"
-  powershell Compress-Archive -DestinationPath '$(SolutionDir)bld\$(SolutionName)_$(InformationalVersion).zip' -Path '"$(DVInstallPath)Mods\$(SolutionName)\' -Force
+  powershell Compress-Archive -DestinationPath '$(SolutionDir)bld\$(SolutionName)_X.X.X$(InformationalVersion).zip' -Path '"$(DVInstallPath)Mods\$(SolutionName)\' -Force
 )</PostBuildEvent>
   </PropertyGroup>
 </Project>
