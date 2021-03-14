@@ -30,7 +30,7 @@ namespace Cybex.DVSuperGauges
 			modEntry.OnUnload = Unload;
 #endif
 
-			Log("Mod Entry Load Done!");
+			
 
 			return true;
 		}
