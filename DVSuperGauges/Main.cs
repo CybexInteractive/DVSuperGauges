@@ -11,7 +11,7 @@ namespace Cybex.DVSuperGauges
 #if DEBUG
 	[EnableReloading]
 #endif
-    public class SuperGauges
+    public class Main
     {
 		public static bool enabled = true;
 		public static UnityModManager.ModEntry mod;
