@@ -4,7 +4,7 @@
 	"Author": "Cybex",
 	"Version": "0.0.0",
 	"AssemblyName": "DVSuperGauges.dll",
-	"EntryMethod": "Cybex.SuperGauges.Load",
+	"EntryMethod": "Cybex.DVSuperGauges.SuperGauges.Load",
 	"HomePage": "https://www.nexusmods.com/derailvalley/mods/283/",
 	"Repository": ""
 }
