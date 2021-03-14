@@ -12,6 +12,8 @@
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+	  <InformationalVersion>0.0.0</InformationalVersion>
+	  <LangVersion>8.0</LangVersion>
     <DVInstallPath>C:\Program Files (x86)\Steam\steamapps\common\Derail Valley\</DVInstallPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -63,8 +65,7 @@ copy $(TargetPath) "$(DVInstallPath)Mods\$(SolutionName)\"
 copy $(SolutionDir)\$(SolutionName)\Info.json "$(DVInstallPath)Mods\$(SolutionName)\"
 
 if $(Configuration) == Release (
-  mkdir "$(SolutionDir)bld\"
-  powershell Compress-Archive -DestinationPath '$(SolutionDir)bld\$(SolutionName)_X.X.X$(InformationalVersion).zip' -Path '"$(DVInstallPath)Mods\$(SolutionName)\' -Force
+  powershell Compress-Archive -DestinationPath '$(SolutionName)_$(InformationalVersion).zip' -Path '"$(DVInstallPath)Mods\$(SolutionName)\' -Force
 )</PostBuildEvent>
   </PropertyGroup>
 </Project>
