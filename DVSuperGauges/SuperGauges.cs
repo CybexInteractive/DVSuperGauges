@@ -63,7 +63,7 @@ namespace Cybex.DVSuperGauges
 
 		static void Log (string msg)
 		{
-			mod?.Logger.Log($"[DV Mouse Smoothing] {msg}");
+			mod?.Logger.Log($"[DV Super Gauges] {msg}");
 		}
 
 		public class Settings : UnityModManager.ModSettings, IDrawable
