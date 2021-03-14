@@ -2,7 +2,7 @@
 	"Id": "DVSuperGauges",
 	"DisplayName": "Super Gauges",
 	"Author": "Cybex",
-	"Version": "0.0.0",
+	"Version": "0.0.1",
 	"AssemblyName": "DVSuperGauges.dll",
 	"EntryMethod": "Cybex.DVSuperGauges.SuperGauges.Load",
 	"HomePage": "https://www.nexusmods.com/derailvalley/mods/283/",
