@@ -70,4 +70,5 @@ if $(Configuration) == Release (
   powershell Compress-Archive -DestinationPath '$(SolutionName)_$(InformationalVersion).zip' -Path '"$(DVInstallPath)Mods\$(SolutionName)\' -Force
 )</PostBuildEvent>
   </PropertyGroup>
+  <ProjectExtensions />
 </Project>

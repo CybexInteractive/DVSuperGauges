@@ -6,5 +6,5 @@
 	"AssemblyName": "DVSuperGauges.dll",
 	"EntryMethod": "Cybex.DVSuperGauges.SuperGauges.Load",
 	"HomePage": "https://www.nexusmods.com/derailvalley/mods/283/",
-	"Repository": "https://github.com/CybexInteractive/DVSuperGauges/blob/master/DVSuperGauges/Repository.json"
+	"Repository": "https://raw.githubusercontent.com/CybexInteractive/DVSuperGauges/master/DVSuperGauges/Repository.json"
 }
