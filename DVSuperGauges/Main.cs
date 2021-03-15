@@ -17,6 +17,9 @@ namespace Cybex.DVSuperGauges
 		public static UnityModManager.ModEntry mod;
 		public static Settings settings = new Settings();
 
+		public static string ModPath => mod.Path;
+
+
 		public static bool Load (UnityModManager.ModEntry modEntry)
 		{
 			mod = modEntry;
@@ -30,9 +33,16 @@ namespace Cybex.DVSuperGauges
 			modEntry.OnUnload = Unload;
 #endif
 
-			
+			if (SaveLoadController.carsAndJobsLoadingFinished && WorldStreamingInit.IsLoaded) OnLoadingFinished();
+			else WorldStreamingInit.LoadingFinished += OnLoadingFinished;
 
 			return true;
+		}
+
+		static void OnLoadingFinished ()
+		{
+			WorldStreamingInit.LoadingFinished -= OnLoadingFinished;
+			SuperGauges.Init();
 		}
 
 		static bool OnToggle (UnityModManager.ModEntry modEntry, bool value)
@@ -54,25 +64,29 @@ namespace Cybex.DVSuperGauges
 #if DEBUG
 		static bool Unload (UnityModManager.ModEntry modEntry)
 		{
-			var harmony = new Harmony(modEntry.Info.Id);
-			harmony.UnpatchAll(modEntry.Info.Id);
+			//var harmony = new Harmony(modEntry.Info.Id);
+			//harmony.UnpatchAll(modEntry.Info.Id);
+
+			SuperGauges.Stop();
 
 			return true;
 		}
 #endif
 
-		static void Log (string msg)
+		public static void Log (string msg)
 		{
 			mod?.Logger.Log($"[DV Super Gauges] {msg}");
 		}
 
 		public class Settings : UnityModManager.ModSettings, IDrawable
 		{
-			//[Draw("Hardness ", DrawType.Slider, Min = 1, Max = 10, Precision = 1)] public float dmpMul = 4;
+			[Draw("Shunter", DrawType.Toggle)] public bool LocoShunterTRUE;
+			[Draw("Steamer", DrawType.Toggle)] public bool LocoSteamerHeavyTRUE;
+			[Draw("Diesel", DrawType.Toggle)] public bool LocoDieselTRUE;
 
 			override public void Save (UnityModManager.ModEntry entry) { Save<Settings>(this, entry); }
 
-			public void OnChange () { }
+			public void OnChange () { UnityEngine.Debug.LogWarning("Settings OnChange()"); SuperGauges.SetSuperGauges(); }
 		}
 	}
 }
