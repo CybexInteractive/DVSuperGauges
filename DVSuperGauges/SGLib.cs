@@ -30,6 +30,7 @@ namespace Cybex.DVSuperGauges
 			TryLoadTextures(LocoDiesel, "LocoDiesel_gauges_01", TexPath_LocoDiesel + Main.settings.currentLocoDieselDirName, 2048, 1024);
 		}
 
+		private TextureSet van_loco_621, van_loco_steam_H, van_LocoDiesel;
 		private TextureSet tex_loco_621, tex_loco_steam_H, tex_LocoDiesel;
 		private TextureSet van_loco_621, van_loco_steam_H, van_LocoDiesel;
 		private TextureSet tex_loco_steam_H_WaterLevel, van_loco_steam_H_WaterLevel;
@@ -121,9 +122,6 @@ namespace Cybex.DVSuperGauges
 			if (!Directory.Exists(path)) Directory.CreateDirectory(path);
 			mat = CarTypes.GetCarPrefab(TrainCarType.LocoSteamHeavy).GetComponent<TrainCar>().interiorPrefab.transform
 				.Find("Gauges").GetComponent<MeshRenderer>().sharedMaterial;
-			ExportMaterialTextures(path, mat);
-			mat = CarTypes.GetCarPrefab(TrainCarType.LocoSteamHeavy).GetComponent<TrainCar>().interiorPrefab.transform
-				.Find("I boiler water/water level").GetComponent<MeshRenderer>().sharedMaterial;
 			ExportMaterialTextures(path, mat);
 			// DIESEL
 			path = TexPath + "[Vanilla]/LocoDiesel/";
