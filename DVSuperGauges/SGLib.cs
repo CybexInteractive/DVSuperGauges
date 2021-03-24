@@ -32,7 +32,6 @@ namespace Cybex.DVSuperGauges
 
 		private TextureSet van_loco_621, van_loco_steam_H, van_LocoDiesel;
 		private TextureSet tex_loco_621, tex_loco_steam_H, tex_LocoDiesel;
-		private TextureSet van_loco_621, van_loco_steam_H, van_LocoDiesel;
 		private TextureSet tex_loco_steam_H_WaterLevel, van_loco_steam_H_WaterLevel;
 
 		public static SGLib Instance { get; private set; }
