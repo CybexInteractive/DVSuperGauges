@@ -122,6 +122,9 @@ namespace Cybex.DVSuperGauges
 			mat = CarTypes.GetCarPrefab(TrainCarType.LocoSteamHeavy).GetComponent<TrainCar>().interiorPrefab.transform
 				.Find("Gauges").GetComponent<MeshRenderer>().sharedMaterial;
 			ExportMaterialTextures(path, mat);
+			mat = CarTypes.GetCarPrefab(TrainCarType.LocoSteamHeavy).GetComponent<TrainCar>().interiorPrefab.transform
+				.Find("I boiler water/water level").GetComponent<MeshRenderer>().sharedMaterial;
+			ExportMaterialTextures(path, mat);
 			// DIESEL
 			path = TexPath + "[Vanilla]/LocoDiesel/";
 			if (!Directory.Exists(path)) Directory.CreateDirectory(path);
