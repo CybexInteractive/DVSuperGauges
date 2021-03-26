@@ -61,9 +61,6 @@ namespace Cybex.DVSuperGauges
 
 		#region Private Fields
 
-		//private static Material steamerGaugesMat;
-		//private static Material steamerWaterLevelMat;
-
 		private static List<string> steamerCabLightsOn;
 
 		#endregion
@@ -77,10 +74,6 @@ namespace Cybex.DVSuperGauges
 			manager = new GameObject().AddComponent<SGManager>();
 			PlayerManager.CarChanged += CarChangeCheck;
 
-			FixDefaultGaugeAngles();
-			//steamerGaugesMat = ReplaceSteamerGaugesMaterials();
-			//steamerWaterLevelMat = ReplaceSteamerWaterLevelMaterial();
-
 			steamerCabLightsOn = new List<string>();
 
 			SetSuperGauges();
@@ -93,13 +86,6 @@ namespace Cybex.DVSuperGauges
 			SGLib.Destroy();
 
 			DestroySteamerWaterLevelBacklight();
-		}
-
-		private static void FixDefaultGaugeAngles ()
-		{
-			FixShunterGaugeAngles();
-			FixSteamerGaugeAngles();
-			FixDieselGaugeAngles();
 		}
 
 		#endregion
@@ -128,76 +114,40 @@ namespace Cybex.DVSuperGauges
 			var trainCar = prefab.GetComponent<TrainCar>();
 			if (trainCar.carType != TrainCarType.LocoShunter && trainCar.carType != TrainCarType.LocoSteamHeavy && trainCar.carType != TrainCarType.LocoDiesel) return;
 
-			var interior = trainCar.interiorPrefab;
-			Material mat = null;
-
 			switch (trainCar.carType)
 			{
 				case TrainCarType.LocoShunter:
-					mat = interior.transform.Find("C dashboard buttons controller/I gauges backlights/lamp emmision indicator/gauge_stickers model").GetComponent<MeshRenderer>().sharedMaterial;
-					SetMaterialTextures(mat, SGLib.Tex_LocoShunter, SGLib.Van_LocoShunter, restoreDefaults);
-
+					SGLib.ReloadShunterTextures();
 					if (PlayerManager.LastLoco != null)
 					{
-						if (PlayerManager.LastLoco.carType == TrainCarType.LocoShunter && PlayerManager.LastLoco.IsInteriorLoaded)
+						if (PlayerManager.LastLoco.carType == TrainCarType.LocoShunter)
 						{
-							mat = PlayerManager.LastLoco.interior.Find("loco_621_interior(Clone)/C dashboard buttons controller/I gauges backlights/lamp emmision indicator/gauge_stickers model").GetComponent<MeshRenderer>().sharedMaterial;
-							if (mat != null) SetMaterialTextures(mat, SGLib.Tex_LocoShunter, SGLib.Van_LocoShunter, restoreDefaults);
-
-							if (!restoreDefaults)
-							{
-								SetShunterNeedleTextures();
-								SetShunterNeedleLights(new ValueChangedEventArgs(0, PlayerManager.Car.interior.GetComponentInChildren<ShunterDashboardControls>().cabLightRotary.GetComponent<ControlImplBase>().Value));
-
-								manager.StartCoroutine(manager.ExecuteAfterInteriorLoaded(
-								() => PlayerManager.Car.interior.GetComponentInChildren<ShunterDashboardControls>().cabLightRotary.GetComponent<ControlImplBase>().ValueChanged -= SetShunterNeedleLights,
-								() => PlayerManager.Car.interior.GetComponentInChildren<ShunterDashboardControls>().cabLightRotary.GetComponent<ControlImplBase>().ValueChanged += SetShunterNeedleLights
-								));
-							}
-
-							if (restoreDefaults) SetshunterNeedlesToDefault();
+							if (!restoreDefaults) CarChangeCheck(PlayerManager.LastLoco);
+							if (restoreDefaults) RestoreShunterDefaults(PlayerManager.LastLoco);
 						}
 					}
 					break;
 
 				case TrainCarType.LocoSteamHeavy:
 					SGLib.ReloadSteamerTextures();
-
 					if (PlayerManager.LastLoco != null)
 					{
 						if (PlayerManager.LastLoco.carType == TrainCarType.LocoSteamHeavy)
 						{
 							if (!restoreDefaults) CarChangeCheck(PlayerManager.LastLoco);
-
 							if (restoreDefaults) RestoreSteamerDefaults(PlayerManager.LastLoco);
 						}
 					}
-
 					break;
 
 				case TrainCarType.LocoDiesel:
-					mat = interior.transform.Find("offset/I Indicator lamps/I gauges backlights/lamp emission indicator/gauge_labels").GetComponent<MeshRenderer>().sharedMaterial;
-					SetMaterialTextures(mat, SGLib.LocoDiesel, SGLib.Van_LocoDiesel, restoreDefaults);
-
+					SGLib.ReloadDieselTextures();
 					if (PlayerManager.LastLoco != null)
 					{
-						if (PlayerManager.LastLoco.carType == TrainCarType.LocoDiesel && PlayerManager.LastLoco.IsInteriorLoaded)
+						if (PlayerManager.LastLoco.carType == TrainCarType.LocoDiesel)
 						{
-							mat = PlayerManager.LastLoco.interior.Find("LocoDiesel_interior(Clone)/offset/I Indicator lamps/I gauges backlights/lamp emission indicator/gauge_labels").GetComponent<MeshRenderer>().sharedMaterial;
-							if (mat != null) SetMaterialTextures(mat, SGLib.LocoDiesel, SGLib.Van_LocoDiesel, restoreDefaults);
-
-							if (!restoreDefaults)
-							{
-								SetDieselNeedleTextures();
-								SetDieselNeedleLights(new ValueChangedEventArgs(0, PlayerManager.Car.interior.GetComponentInChildren<DieselDashboardControls>().cabLightRotary.GetComponent<ControlImplBase>().Value));
-
-								manager.StartCoroutine(manager.ExecuteAfterInteriorLoaded(
-								() => PlayerManager.Car.interior.GetComponentInChildren<DieselDashboardControls>().cabLightRotary.GetComponent<ControlImplBase>().ValueChanged -= SetDieselNeedleLights,
-								() => PlayerManager.Car.interior.GetComponentInChildren<DieselDashboardControls>().cabLightRotary.GetComponent<ControlImplBase>().ValueChanged += SetDieselNeedleLights
-								));
-							}
-
-							if (restoreDefaults) SetDieselNeedlesToDefault();
+							if (!restoreDefaults) CarChangeCheck(PlayerManager.LastLoco);
+							if (restoreDefaults) RestoreDieselDefaults(PlayerManager.LastLoco);
 						}
 					}
 					break;
@@ -215,11 +165,23 @@ namespace Cybex.DVSuperGauges
 				manager.StartCoroutine(manager.ExecuteAfterInteriorLoaded(
 					() =>
 					{
+						FixShunterGaugeAngles(trainCar);
+
 						if (Main.settings.LocoShunterTRUE)
 						{
-							SetShunterNeedleLights(new ValueChangedEventArgs(0, trainCar.interior.GetComponentInChildren<ShunterDashboardControls>().cabLightRotary.GetComponent<ControlImplBase>().Value));
-							trainCar.interior.GetComponentInChildren<ShunterDashboardControls>().cabLightRotary.GetComponent<ControlImplBase>().ValueChanged -= SetShunterNeedleLights;
-							trainCar.interior.GetComponentInChildren<ShunterDashboardControls>().cabLightRotary.GetComponent<ControlImplBase>().ValueChanged += SetShunterNeedleLights;
+							SGLib.Mat_LocoShunter_Gauge.SetColor("_EmissionColor", trainCar.interior.GetComponentInChildren<ShunterDashboardControls>()
+								.cabLightRotary.GetComponent<ControlImplBase>().Value > 0 ? Color.white : Color.black);
+
+							// set gauges material
+							trainCar.interior.Find($"loco_621_interior(Clone)/C dashboard buttons controller/I gauges backlights/lamp emmision indicator/gauge_stickers model")
+								.GetComponent<MeshRenderer>().material = SGLib.Mat_LocoShunter_Gauge;
+							// set needles material
+							SHUNTER_NEEDLE_TRANSFORMS.ToList().ForEach(t =>
+								trainCar.interior.Find($"loco_621_interior(Clone)/{t}").GetComponent<MeshRenderer>().material = SGLib.Mat_LocoShunter_Gauge);
+							// lightswitch event sub
+							var sdc = PlayerManager.Car.interior.GetComponentInChildren<ShunterDashboardControls>().cabLightRotary.GetComponent<ControlImplBase>();
+							sdc.ValueChanged -= SetShunterLitState;
+							sdc.ValueChanged += SetShunterLitState;
 						}
 					}));
 			}
@@ -228,6 +190,8 @@ namespace Cybex.DVSuperGauges
 				manager.StartCoroutine(manager.ExecuteAfterInteriorLoaded(
 					() =>
 					{
+						FixSteamerGaugeAngles(trainCar);
+
 						if (steamerCabLightsOn.Contains(trainCar.ID))
 							trainCar.interior.Find("loco_steam_H_interior(Clone)/C inidactor light switch").GetComponentInChildren<ControlImplBase>().SetValue(1);
 
@@ -240,16 +204,15 @@ namespace Cybex.DVSuperGauges
 						{
 							if (trainCar.interior.Find("water level backlight") == null)
 								CreateSteamerWaterLevelBacklight(trainCar.interior.gameObject);
-							trainCar.interior.Find("water level backlight").GetComponent<MeshRenderer>().sharedMaterial = SGLib.Mat_LocoSteam_Gauge;
+							trainCar.interior.Find("water level backlight").GetComponent<MeshRenderer>().material = SGLib.Mat_LocoSteam_Gauge;
 
 							// set gauges material
-							trainCar.interior.Find($"loco_steam_H_interior(Clone)/Gauges").GetComponent<MeshRenderer>().sharedMaterial = SGLib.Mat_LocoSteam_Gauge;
+							trainCar.interior.Find($"loco_steam_H_interior(Clone)/Gauges").GetComponent<MeshRenderer>().material = SGLib.Mat_LocoSteam_Gauge;
 							// set needles material
 							STEAMER_NEEDLE_TRANSFORMS.ToList().ForEach(t =>
-								trainCar.interior.Find($"loco_steam_H_interior(Clone)/{t}").GetComponent<MeshRenderer>().sharedMaterial = SGLib.Mat_LocoSteam_Gauge
-							);
+								trainCar.interior.Find($"loco_steam_H_interior(Clone)/{t}").GetComponent<MeshRenderer>().material = SGLib.Mat_LocoSteam_Gauge);
 							// set waterlevels material
-							trainCar.interior.Find("loco_steam_H_interior(Clone)/I boiler water/water level").GetComponent<MeshRenderer>().sharedMaterial = SGLib.Mat_LocoSteam_WaterLevel;
+							trainCar.interior.Find("loco_steam_H_interior(Clone)/I boiler water/water level").GetComponent<MeshRenderer>().material = SGLib.Mat_LocoSteam_WaterLevel;
 
 							// lightswitch event sub
 							cib.ValueChanged -= SetSteamerLitState;
@@ -264,11 +227,23 @@ namespace Cybex.DVSuperGauges
 				manager.StartCoroutine(manager.ExecuteAfterInteriorLoaded(
 					() =>
 					{
+						FixDieselGaugeAngles(trainCar);
+
 						if (Main.settings.LocoDieselTRUE)
 						{
-							SetDieselNeedleLights(new ValueChangedEventArgs(0, trainCar.interior.GetComponentInChildren<DieselDashboardControls>().cabLightRotary.GetComponent<ControlImplBase>().Value));
-							trainCar.interior.GetComponentInChildren<DieselDashboardControls>().cabLightRotary.GetComponent<ControlImplBase>().ValueChanged -= SetDieselNeedleLights;
-							trainCar.interior.GetComponentInChildren<DieselDashboardControls>().cabLightRotary.GetComponent<ControlImplBase>().ValueChanged += SetDieselNeedleLights;
+							SGLib.Mat_LocoDiesel_Gauge.SetColor("_EmissionColor", trainCar.interior.GetComponentInChildren<DieselDashboardControls>()
+								.cabLightRotary.GetComponent<ControlImplBase>().Value > 0 ? Color.white : Color.black);
+
+							// set gauges material
+							trainCar.interior.Find($"LocoDiesel_interior(Clone)/offset/I Indicator lamps/I gauges backlights/lamp emission indicator/gauge_labels")
+								.GetComponent<MeshRenderer>().material = SGLib.Mat_LocoDiesel_Gauge;
+							// set needles material
+							DIESEL_NEEDLE_TRANSFORMS.ToList().ForEach(t =>
+								trainCar.interior.Find($"LocoDiesel_interior(Clone)/{t}").GetComponent<MeshRenderer>().material = SGLib.Mat_LocoDiesel_Gauge);
+							// lightswitch event sub
+							var ddc = PlayerManager.Car.interior.GetComponentInChildren<DieselDashboardControls>().cabLightRotary.GetComponent<ControlImplBase>();
+							ddc.ValueChanged -= SetDieselLitState;
+							ddc.ValueChanged += SetDieselLitState;
 						}
 					}));
 			}
@@ -278,19 +253,19 @@ namespace Cybex.DVSuperGauges
 
 		#region Steamer Specific
 
-		private static void FixSteamerGaugeAngles ()
+		private static void FixSteamerGaugeAngles (TrainCar trainCar)
 		{
-			var interiorPrefab = CarTypes.GetCarPrefab(TrainCarType.LocoSteamHeavy).GetComponent<TrainCar>().interiorPrefab;
-			var ig = interiorPrefab.transform.Find("I brake needle pipe").GetComponent<IndicatorGauge>();
+			var interior = trainCar.interior;
+			var ig = interior.transform.Find("loco_steam_H_interior(Clone)/I brake needle pipe").GetComponent<IndicatorGauge>();
 			ig.minAngle = -316;
 			ig.maxAngle = 46;
-			ig = interiorPrefab.transform.Find("I brake needle aux").GetComponent<IndicatorGauge>();
+			ig = interior.transform.Find("loco_steam_H_interior(Clone)/I brake needle aux").GetComponent<IndicatorGauge>();
 			ig.minAngle = -318;
 			ig.maxAngle = 45;
-			ig = interiorPrefab.transform.Find("I speedometer").GetComponent<IndicatorGauge>();
+			ig = interior.transform.Find("loco_steam_H_interior(Clone)/I speedometer").GetComponent<IndicatorGauge>();
 			ig.minAngle = -223; // -221
 			ig.maxAngle = 45; // 49
-			ig = interiorPrefab.transform.Find("I pressure meter").GetComponent<IndicatorGauge>();
+			ig = interior.transform.Find("loco_steam_H_interior(Clone)/I pressure meter").GetComponent<IndicatorGauge>();
 			ig.minAngle = -226; // -221
 			ig.maxAngle = 135; // 139
 		}
@@ -343,17 +318,15 @@ namespace Cybex.DVSuperGauges
 			if (!trainCar.IsInteriorLoaded) return;
 
 			var prefab = CarTypes.GetCarPrefab(TrainCarType.LocoSteamHeavy).GetComponent<TrainCar>().interiorPrefab.transform;
-			var gaugeMat = prefab.Find("Gauges").GetComponent<MeshRenderer>().sharedMaterial;
+			var gaugeMat = prefab.Find("Gauges").GetComponent<MeshRenderer>().material;
 
 			// set gauges material
-			trainCar.interior.Find($"loco_steam_H_interior(Clone)/Gauges").GetComponent<MeshRenderer>().sharedMaterial = gaugeMat;
+			trainCar.interior.Find($"loco_steam_H_interior(Clone)/Gauges").GetComponent<MeshRenderer>().material = gaugeMat;
 			// set needles material
-			STEAMER_NEEDLE_TRANSFORMS.ToList().ForEach(t =>
-				trainCar.interior.Find($"loco_steam_H_interior(Clone)/{t}").GetComponent<MeshRenderer>().sharedMaterial = gaugeMat
-			);
+			STEAMER_NEEDLE_TRANSFORMS.ToList().ForEach(t => trainCar.interior.Find($"loco_steam_H_interior(Clone)/{t}").GetComponent<MeshRenderer>().material = gaugeMat);
 			// set waterlevels material
-			trainCar.interior.Find("loco_steam_H_interior(Clone)/I boiler water/water level").GetComponent<MeshRenderer>().sharedMaterial = 
-				prefab.Find("I boiler water/water level").GetComponent<MeshRenderer>().sharedMaterial;
+			trainCar.interior.Find("loco_steam_H_interior(Clone)/I boiler water/water level").GetComponent<MeshRenderer>().material = 
+				prefab.Find("I boiler water/water level").GetComponent<MeshRenderer>().material;
 		}
 
 		private static void DestroySteamerWaterLevelBacklight ()
@@ -378,94 +351,70 @@ namespace Cybex.DVSuperGauges
 
 		#endregion
 
-		#region Shunter Specific
+		#region Shunter Specifica
 
-		private static void FixShunterGaugeAngles ()
+		private static void FixShunterGaugeAngles (TrainCar trainCar)
 		{
-			var interiorPrefab = CarTypes.GetCarPrefab(TrainCarType.LocoShunter).GetComponent<TrainCar>().interiorPrefab;
-			var ig = interiorPrefab.transform.Find("I brake_pipe_meter").GetComponent<IndicatorGauge>();
-			ig.minAngle = -280;
-			ig = interiorPrefab.transform.Find("I brake_aux_res_meter").GetComponent<IndicatorGauge>();
-			ig.minAngle = -280;
+			var interiorPrefab = trainCar.interior;
+			var ig = interiorPrefab.transform.Find("loco_621_interior(Clone)/I brake_pipe_meter").GetComponent<IndicatorGauge>();
+			ig.minAngle = -277;
+			ig = interiorPrefab.transform.Find("loco_621_interior(Clone)/I brake_aux_res_meter").GetComponent<IndicatorGauge>();
+			ig.minAngle = -278;
 		}
 
-		private static void SetShunterNeedleTextures (bool restoreDefaults = false)
+		private static void SetShunterLitState (ValueChangedEventArgs e)
 		{
-			SHUNTER_NEEDLE_TRANSFORMS.ToList().ForEach(t =>
-			{
-				var mat = PlayerManager.Car.interior.Find($"loco_621_interior(Clone)/{t}").GetComponent<MeshRenderer>().material;
-				SetMaterialTextures(mat, SGLib.Tex_LocoShunter, SGLib.Van_LocoShunter, restoreDefaults);
-			});
+			SGLib.Mat_LocoShunter_Gauge.SetColor("_EmissionColor", e.newValue > 0 ? Color.white : Color.black);
 		}
 
-		private static void SetShunterNeedleLights (ValueChangedEventArgs e)
+		private static void RestoreShunterDefaults (TrainCar trainCar)
 		{
-			SHUNTER_NEEDLE_TRANSFORMS.ToList().ForEach(t =>
-				PlayerManager.Car.interior.Find($"loco_621_interior(Clone)/{t}").GetComponent<MeshRenderer>().material.SetColor("_EmissionColor", e.newValue > 0 ? Color.white : Color.black)
-			);
-		}
+			var prefab = CarTypes.GetCarPrefab(TrainCarType.LocoShunter).GetComponent<TrainCar>().interiorPrefab.transform;
+			var gaugeMat = prefab.Find("C dashboard buttons controller/I gauges backlights/lamp emmision indicator/gauge_stickers model").GetComponent<MeshRenderer>().material;
+			gaugeMat.SetColor("_EmissionColor", trainCar.interior.GetComponentInChildren<ShunterDashboardControls>().cabLightRotary.GetComponent<ControlImplBase>().Value > 0 ? Color.white : Color.black);
 
-		private static void SetshunterNeedlesToDefault ()
-		{
-			SHUNTER_NEEDLE_TRANSFORMS.ToList().ForEach(t =>
-				PlayerManager.Car.interior.Find($"loco_621_interior(Clone)/{t}").GetComponent<MeshRenderer>().sharedMaterial =
-				PlayerManager.Car.interior.Find("loco_621_interior(Clone)/C dashboard buttons controller/I gauges backlights/lamp emmision indicator/gauge_stickers model").GetComponent<MeshRenderer>().sharedMaterial
-			);
+			// set gauges material
+			trainCar.interior.Find($"loco_621_interior(Clone)/C dashboard buttons controller/I gauges backlights/lamp emmision indicator/gauge_stickers model")
+				.GetComponent<MeshRenderer>().material = gaugeMat;
+			// set needles material
+			SHUNTER_NEEDLE_TRANSFORMS.ToList().ForEach(t => trainCar.interior.Find($"loco_621_interior(Clone)/{t}").GetComponent<MeshRenderer>().material = gaugeMat);
 		}
 
 		#endregion
 
 		#region Diesel Specific
 
-		private static void FixDieselGaugeAngles ()
+		private static void FixDieselGaugeAngles (TrainCar trainCar)
 		{
-			var interiorPrefab = CarTypes.GetCarPrefab(TrainCarType.LocoDiesel).GetComponent<TrainCar>().interiorPrefab;
-			var ig = interiorPrefab.transform.Find("offset/I Indicator meters/I ind_brake_res_meter").GetComponent<IndicatorGauge>();
+			var interior = trainCar.interior;
+			var ig = interior.transform.Find("LocoDiesel_interior(Clone)/offset/I Indicator meters/I ind_brake_res_meter").GetComponent<IndicatorGauge>();
 			ig.minAngle = -280;
-			ig = interiorPrefab.transform.Find("offset/I Indicator meters/I ind_brake_aux_meter").GetComponent<IndicatorGauge>();
+			ig = interior.transform.Find("LocoDiesel_interior(Clone)/offset/I Indicator meters/I ind_brake_aux_meter").GetComponent<IndicatorGauge>();
 			ig.minAngle = -280;
-			ig = interiorPrefab.transform.Find("offset/I Indicator meters/I brake_aux_meter").GetComponent<IndicatorGauge>();
+			ig = interior.transform.Find("LocoDiesel_interior(Clone)/offset/I Indicator meters/I brake_aux_meter").GetComponent<IndicatorGauge>();
 			ig.minAngle = -280;
-			ig = interiorPrefab.transform.Find("offset/I Indicator meters/I brake_res_meter").GetComponent<IndicatorGauge>();
+			ig = interior.transform.Find("LocoDiesel_interior(Clone)/offset/I Indicator meters/I brake_res_meter").GetComponent<IndicatorGauge>();
 			ig.minAngle = -280;
 		}
 
-		private static void SetDieselNeedleTextures (bool restoreDefaults = false)
+		private static void SetDieselLitState (ValueChangedEventArgs e)
 		{
-			DIESEL_NEEDLE_TRANSFORMS.ToList().ForEach(t =>
-			{
-				var mat = PlayerManager.Car.interior.Find($"LocoDiesel_interior(Clone)/{t}").GetComponent<MeshRenderer>().material;
-				SetMaterialTextures(mat, SGLib.LocoDiesel, SGLib.Van_LocoDiesel, restoreDefaults);
-			});
+			SGLib.Mat_LocoDiesel_Gauge.SetColor("_EmissionColor", e.newValue > 0 ? Color.white : Color.black);
 		}
 
-		private static void SetDieselNeedleLights (ValueChangedEventArgs e)
+		private static void RestoreDieselDefaults (TrainCar trainCar)
 		{
-			DIESEL_NEEDLE_TRANSFORMS.ToList().ForEach(t =>
-				PlayerManager.Car.interior.Find($"LocoDiesel_interior(Clone)/{t}").GetComponent<MeshRenderer>().material.SetColor("_EmissionColor", e.newValue > 0 ? Color.white : Color.black)
-			);
+			if (!trainCar.IsInteriorLoaded) return;
+
+			var prefab = CarTypes.GetCarPrefab(TrainCarType.LocoDiesel).GetComponent<TrainCar>().interiorPrefab.transform;
+			var gaugeMat = prefab.Find("offset/I Indicator lamps/I gauges backlights/lamp emission indicator/gauge_labels").GetComponent<MeshRenderer>().material;
+			gaugeMat.SetColor("_EmissionColor", trainCar.interior.GetComponentInChildren<DieselDashboardControls>().cabLightRotary.GetComponent<ControlImplBase>().Value > 0 ? Color.white : Color.black);
+
+			// set gauges material
+			trainCar.interior.Find($"LocoDiesel_interior(Clone)/offset/I Indicator lamps/I gauges backlights/lamp emission indicator/gauge_labels").GetComponent<MeshRenderer>().material = gaugeMat;
+			// set needles material
+			DIESEL_NEEDLE_TRANSFORMS.ToList().ForEach(t => trainCar.interior.Find($"LocoDiesel_interior(Clone)/{t}").GetComponent<MeshRenderer>().material = gaugeMat);
 		}
-
-		private static void SetDieselNeedlesToDefault ()
-		{
-			DIESEL_NEEDLE_TRANSFORMS.ToList().ForEach(t =>
-				PlayerManager.Car.interior.Find($"LocoDiesel_interior(Clone)/{t}").GetComponent<MeshRenderer>().sharedMaterial =
-				PlayerManager.Car.interior.Find("LocoDiesel_interior(Clone)/offset/I Indicator lamps/I gauges backlights/lamp emission indicator/gauge_labels").GetComponent<MeshRenderer>().sharedMaterial
-			);
-		} 
-
-		#endregion
-
-		#region Miscellaneous
-
-		public static void SetMaterialTextures (Material mat, TextureSet textureSet, TextureSet defaultSet, bool restoreDefaults = false)
-		{
-			mat.SetTexture("_MainTex", restoreDefaults ? defaultSet.d : textureSet.d ?? defaultSet.d);
-			mat.SetTexture("_BumpMap", restoreDefaults ? defaultSet.n : textureSet.n ?? defaultSet.n);
-			mat.SetTexture("_MetallicGlossMap", restoreDefaults ? defaultSet.s : textureSet.s ?? defaultSet.s);
-			mat.SetTexture("_OcclusionMap", restoreDefaults ? defaultSet.s : textureSet.s ?? defaultSet.s);
-			mat.SetTexture("_EmissionMap", restoreDefaults ? defaultSet.e : textureSet.e ?? defaultSet.e);
-		} 
 
 		#endregion
 	}
