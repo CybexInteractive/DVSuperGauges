@@ -95,6 +95,7 @@ namespace Cybex.DVSuperGauges
 
 			if (settings.LocoShunterTRUE && optionsMenu == "shunter")
 			{
+				GUILayout.BeginVertical(GUILayout.MinHeight(150));
 				scrollShunter = GUILayout.BeginScrollView(scrollShunter);
 				GUILayout.BeginHorizontal();
 				dirsShunter = Directory.GetDirectories(SGLib.TexPath_LocoShunter);
@@ -132,6 +133,7 @@ namespace Cybex.DVSuperGauges
 				}
 				GUILayout.EndHorizontal();
 				GUILayout.EndScrollView();
+				GUILayout.EndVertical();
 			}
 
 
@@ -150,6 +152,7 @@ namespace Cybex.DVSuperGauges
 
 			if (settings.LocoSteamerHeavyTRUE && optionsMenu == "steamer")
 			{
+				GUILayout.BeginVertical(GUILayout.MinHeight(150));
 				scrollSteamer = GUILayout.BeginScrollView(scrollSteamer);
 				GUILayout.BeginHorizontal();
 				dirsSteamer = Directory.GetDirectories(SGLib.TexPath_LocoSteamHeavy);
@@ -187,6 +190,7 @@ namespace Cybex.DVSuperGauges
 				}
 				GUILayout.EndHorizontal();
 				GUILayout.EndScrollView();
+				GUILayout.EndVertical();
 			}
 
 
@@ -205,6 +209,7 @@ namespace Cybex.DVSuperGauges
 
 			if (settings.LocoDieselTRUE && optionsMenu == "diesel")
 			{
+				GUILayout.BeginVertical(GUILayout.MinHeight(150));
 				scrollDiesel = GUILayout.BeginScrollView(scrollDiesel);
 				GUILayout.BeginHorizontal();
 				dirsDiesel = Directory.GetDirectories(SGLib.TexPath_LocoDiesel);
@@ -242,6 +247,7 @@ namespace Cybex.DVSuperGauges
 				}
 				GUILayout.EndHorizontal();
 				GUILayout.EndScrollView();
+				GUILayout.EndVertical();
 			}
 		}
 

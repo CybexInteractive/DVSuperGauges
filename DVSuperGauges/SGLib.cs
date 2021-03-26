@@ -18,14 +18,25 @@ namespace Cybex.DVSuperGauges
 			ExportVanillaTextures();
 			StoreVanillaTextures();
 
+			var sourceMat = new Material(
+				CarTypes.GetCarPrefab(TrainCarType.LocoDiesel).GetComponent<TrainCar>().interiorPrefab.transform
+				.Find("offset/I Indicator lamps/I gauges backlights/lamp emission indicator/gauge_labels").GetComponent<MeshRenderer>().sharedMaterial
+				);
+
+			// SHUNTER
 			tex_loco_621 = new TextureSet();
-			TryLoadTextures(LocoShunter, "shunt_gauges_01", TexPath_LocoShunter + Main.settings.currentLocoShunterDirName, 1024, 1024);
+			TryLoadTextures(Tex_LocoShunter, "shunt_gauges_01", TexPath_LocoShunter + Main.settings.currentLocoShunterDirName, 1024, 1024);
 
+			// STEAMER
 			tex_loco_steam_H = new TextureSet();
-			TryLoadTextures(LocoSteamHeavy, "SH_gauges_01", TexPath_LocoSteamHeavy + Main.settings.currentLocoSteamerDirName, 1024, 1024);
-			tex_loco_steam_H_WaterLevel = new TextureSet();
-			TryLoadTextures(LocoSteamHeavy_WaterLevel, "waterlevel_01", TexPath_LocoSteamHeavy + Main.settings.currentLocoSteamerDirName, 8, 128);
+			TryLoadTextures(Tex_LocoSteam_Gauge, "SH_gauges_01", TexPath_LocoSteamHeavy + Main.settings.currentLocoSteamerDirName, 1024, 1024);
+			mat_loco_steam_H_gauge = new Material(sourceMat);
 
+			tex_loco_steam_H_WaterLevel = new TextureSet();
+			TryLoadTextures(Tex_LocoSteam_WaterLevel, "waterlevel_01", TexPath_LocoSteamHeavy + Main.settings.currentLocoSteamerDirName, 8, 128);
+			mat_loco_steam_H_WaterLevel = new Material(sourceMat);
+
+			// DIESEL
 			tex_LocoDiesel = new TextureSet();
 			TryLoadTextures(LocoDiesel, "LocoDiesel_gauges_01", TexPath_LocoDiesel + Main.settings.currentLocoDieselDirName, 2048, 1024);
 		}
@@ -34,6 +45,8 @@ namespace Cybex.DVSuperGauges
 		private TextureSet tex_loco_621, tex_loco_steam_H, tex_LocoDiesel;
 		private TextureSet tex_loco_steam_H_WaterLevel, van_loco_steam_H_WaterLevel;
 
+		private Material mat_loco_steam_H_gauge, mat_loco_steam_H_WaterLevel;
+
 		public static SGLib Instance { get; private set; }
 
 		public static TextureSet Van_LocoShunter => Instance.van_loco_621;
@@ -41,10 +54,13 @@ namespace Cybex.DVSuperGauges
 		public static TextureSet Van_LocoSteamHeavy_WaterLevel => Instance.van_loco_steam_H_WaterLevel;
 		public static TextureSet Van_LocoDiesel => Instance.van_LocoDiesel;
 
-		public static TextureSet LocoShunter => Instance.tex_loco_621;
-		public static TextureSet LocoSteamHeavy => Instance.tex_loco_steam_H;
-		public static TextureSet LocoSteamHeavy_WaterLevel => Instance.tex_loco_steam_H_WaterLevel;
+		public static TextureSet Tex_LocoShunter => Instance.tex_loco_621;
+		public static TextureSet Tex_LocoSteam_Gauge => Instance.tex_loco_steam_H;
+		public static TextureSet Tex_LocoSteam_WaterLevel => Instance.tex_loco_steam_H_WaterLevel;
 		public static TextureSet LocoDiesel => Instance.tex_LocoDiesel;
+
+		public static Material Mat_LocoSteam_Gauge => Instance.mat_loco_steam_H_gauge;
+		public static Material Mat_LocoSteam_WaterLevel => Instance.mat_loco_steam_H_WaterLevel;
 
 		public static string ResPath => Main.ModPath + "Resources/";
 		public static string TexPath => ResPath + "Textures/";
@@ -62,15 +78,18 @@ namespace Cybex.DVSuperGauges
 		public static void ReloadShunterTextures ()
 		{
 			Instance.tex_loco_621 = new TextureSet();
-			TryLoadTextures(LocoShunter, "shunt_gauges_01", TexPath_LocoShunter + Main.settings.currentLocoShunterDirName, 1024, 1024);
+			TryLoadTextures(Tex_LocoShunter, "shunt_gauges_01", TexPath_LocoShunter + Main.settings.currentLocoShunterDirName, 1024, 1024);
 		}
 
 		public static void ReloadSteamerTextures ()
 		{
 			Instance.tex_loco_steam_H = new TextureSet();
-			TryLoadTextures(LocoSteamHeavy, "SH_gauges_01", TexPath_LocoSteamHeavy + Main.settings.currentLocoSteamerDirName, 1024, 1024);
+			TryLoadTextures(Tex_LocoSteam_Gauge, "SH_gauges_01", TexPath_LocoSteamHeavy + Main.settings.currentLocoSteamerDirName, 1024, 1024);
+			SuperGauges.SetMaterialTextures(Mat_LocoSteam_Gauge, Tex_LocoSteam_Gauge, Van_LocoSteamHeavy);
+
 			Instance.tex_loco_steam_H_WaterLevel = new TextureSet();
-			TryLoadTextures(LocoSteamHeavy_WaterLevel, "waterlevel_01", TexPath_LocoSteamHeavy + Main.settings.currentLocoSteamerDirName, 8, 128);
+			TryLoadTextures(Tex_LocoSteam_WaterLevel, "waterlevel_01", TexPath_LocoSteamHeavy + Main.settings.currentLocoSteamerDirName, 8, 128);
+			SuperGauges.SetMaterialTextures(Mat_LocoSteam_WaterLevel, Tex_LocoSteam_WaterLevel, Van_LocoSteamHeavy_WaterLevel);
 		}
 
 		public static void ReloadDieselTextures ()
