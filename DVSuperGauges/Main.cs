@@ -82,7 +82,11 @@ namespace Cybex.DVSuperGauges
 
 			GUILayout.BeginHorizontal();
 			bool LocoShunterTRUE = GUILayout.Toggle(settings.LocoShunterTRUE, "", GUILayout.Width(20));
-			if (settings.LocoShunterTRUE != LocoShunterTRUE) { settings.LocoShunterTRUE = LocoShunterTRUE; SuperGauges.SetSuperGauges(); }
+			if (settings.LocoShunterTRUE != LocoShunterTRUE)
+			{
+				settings.LocoShunterTRUE = LocoShunterTRUE;
+				SuperGauges.SetSuperGauges(!LocoShunterTRUE, TrainCarType.LocoShunter);
+			}
 			GUILayout.Label("Shunter", GUILayout.Width(80));
 			if (settings.LocoShunterTRUE)
 				if (GUILayout.Button("<size=24>\u25BD</size>", new GUIStyle(GUI.skin.button) { richText = true, padding = new RectOffset(0, 0, -6, 0) }, GUILayout.Width(18), GUILayout.Height(18)))
@@ -135,7 +139,8 @@ namespace Cybex.DVSuperGauges
 			bool LocoSteamerHeavyTRUE = GUILayout.Toggle(settings.LocoSteamerHeavyTRUE, "", GUILayout.Width(20));
 			if (settings.LocoSteamerHeavyTRUE != LocoSteamerHeavyTRUE)
 			{
-				settings.LocoSteamerHeavyTRUE = LocoSteamerHeavyTRUE; SuperGauges.SetSuperGauges(!LocoSteamerHeavyTRUE, TrainCarType.LocoSteamHeavy);
+				settings.LocoSteamerHeavyTRUE = LocoSteamerHeavyTRUE;
+				SuperGauges.SetSuperGauges(!LocoSteamerHeavyTRUE, TrainCarType.LocoSteamHeavy);
 			}
 			GUILayout.Label("Steamer", GUILayout.Width(80));
 			if (settings.LocoSteamerHeavyTRUE)
@@ -187,7 +192,11 @@ namespace Cybex.DVSuperGauges
 
 			GUILayout.BeginHorizontal();
 			bool LocoDieselTRUE = GUILayout.Toggle(settings.LocoDieselTRUE, "", GUILayout.Width(20));
-			if (settings.LocoDieselTRUE != LocoDieselTRUE) { settings.LocoDieselTRUE = LocoDieselTRUE; SuperGauges.SetSuperGauges(); }
+			if (settings.LocoDieselTRUE != LocoDieselTRUE)
+			{
+				settings.LocoDieselTRUE = LocoDieselTRUE;
+				SuperGauges.SetSuperGauges(!LocoDieselTRUE, TrainCarType.LocoDiesel);
+			}
 			GUILayout.Label("Diesel", GUILayout.Width(80));
 			if (settings.LocoDieselTRUE)
 				if (GUILayout.Button("<size=24>\u25BD</size>", new GUIStyle(GUI.skin.button) { richText = true, padding = new RectOffset(0, 0, -6, 0) }, GUILayout.Width(18), GUILayout.Height(18)))

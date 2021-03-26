@@ -170,10 +170,10 @@ namespace Cybex.DVSuperGauges
 					{
 						if (PlayerManager.LastLoco.carType == TrainCarType.LocoSteamHeavy && PlayerManager.LastLoco.IsInteriorLoaded)
 						{
-							mat = PlayerManager.LastLoco.interior.Find("loco_steam_H_interior(Clone)/Gauges").GetComponent<MeshRenderer>().material;
+							mat = PlayerManager.LastLoco.interior.Find("loco_steam_H_interior(Clone)/Gauges").GetComponent<MeshRenderer>().sharedMaterial;
 							if (mat != null) SetMaterialTextures(mat, SGLib.LocoSteamHeavy, SGLib.Van_LocoSteamHeavy, restoreDefaults);
 
-							mat = PlayerManager.LastLoco.interior.Find("loco_steam_H_interior(Clone)/I boiler water/water level").GetComponent<MeshRenderer>().material;
+							mat = PlayerManager.LastLoco.interior.Find("loco_steam_H_interior(Clone)/I boiler water/water level").GetComponent<MeshRenderer>().sharedMaterial;
 							if (mat != null) SetMaterialTextures(mat, SGLib.LocoSteamHeavy_WaterLevel, SGLib.Van_LocoSteamHeavy_WaterLevel, restoreDefaults);
 
 							if (!restoreDefaults)
@@ -182,14 +182,15 @@ namespace Cybex.DVSuperGauges
 								SetSteamerWaterLevelTexture();
 
 								if (PlayerManager.LastLoco.interior.Find("water level backlight") == null)
-									CreateSteamerWaterLevelBacklight(steamerGaugesMat, PlayerManager.LastLoco.interior.gameObject);
+									CreateSteamerWaterLevelBacklight(PlayerManager.LastLoco.interior.Find("loco_steam_H_interior(Clone)/Gauges").GetComponent<MeshRenderer>().sharedMaterial, PlayerManager.LastLoco.interior.gameObject);
 
-								var args = new ValueChangedEventArgs(0, PlayerManager.Car.interior.Find("loco_steam_H_interior(Clone)/C inidactor light switch").GetComponentInChildren<ControlImplBase>().Value);
+								var cib = PlayerManager.Car.interior.Find("loco_steam_H_interior(Clone)/C inidactor light switch").GetComponentInChildren<ControlImplBase>();
+								var args = new ValueChangedEventArgs(0, cib.Value);
+
 								SetSteamerNeedleLights(args);
 								SetSteamerGaugesBacklight(args);
 								SetSteamerWaterLevelLight(args);
 
-								var cib = PlayerManager.Car.interior.Find("loco_steam_H_interior(Clone)/C inidactor light switch").GetComponentInChildren<ControlImplBase>();
 								cib.ValueChanged -= SetSteamerNeedleLights;
 								cib.ValueChanged += SetSteamerNeedleLights;
 								cib.ValueChanged -= SetSteamerGaugesBacklight;
@@ -291,14 +292,15 @@ namespace Cybex.DVSuperGauges
 						if (Main.settings.LocoSteamerHeavyTRUE)
 						{
 							if (trainCar.interior.Find("water level backlight") == null)
-								CreateSteamerWaterLevelBacklight(steamerGaugesMat, trainCar.interior.gameObject);
+								CreateSteamerWaterLevelBacklight(PlayerManager.LastLoco.interior.Find("loco_steam_H_interior(Clone)/Gauges").GetComponent<MeshRenderer>().sharedMaterial, trainCar.interior.gameObject);
 
-							var args = new ValueChangedEventArgs(0, trainCar.interior.Find("loco_steam_H_interior(Clone)/C inidactor light switch").GetComponentInChildren<ControlImplBase>().Value);
+							var cib = trainCar.interior.Find("loco_steam_H_interior(Clone)/C inidactor light switch").GetComponentInChildren<ControlImplBase>();
+							var args = new ValueChangedEventArgs(0, cib.Value);
+
 							SetSteamerNeedleLights(args);
 							SetSteamerGaugesBacklight(args);
 							SetSteamerWaterLevelLight(args);
 
-							var cib = trainCar.interior.Find("loco_steam_H_interior(Clone)/C inidactor light switch").GetComponentInChildren<ControlImplBase>();
 							cib.ValueChanged -= SetSteamerNeedleLights;
 							cib.ValueChanged += SetSteamerNeedleLights;
 							cib.ValueChanged -= SetSteamerGaugesBacklight;
@@ -365,19 +367,19 @@ namespace Cybex.DVSuperGauges
 			return waterLevelMaterial;
 		}
 
-		private static void CreateSteamerWaterLevelBacklight (Material targetMaterial, GameObject targetObject = null)
+		private static void CreateSteamerWaterLevelBacklight (Material sharedMaterial, GameObject targetObject = null)
 		{
-			GameObject level = targetObject.transform.Find("loco_steam_H_interior(Clone)/I boiler water/water level").gameObject;
+			GameObject level = targetObject.transform.Find("loco_steam_H_interior(Clone)/I boiler water").gameObject;
 
 			var go = new GameObject("water level backlight", typeof(MeshFilter), typeof(MeshRenderer));
 
 			var mesh = new Mesh();
 			mesh.vertices = new Vector3[]
 			{
-				new Vector3(-0.011f,  0.000f, -0.013f),
-				new Vector3( 0.011f,  0.000f, -0.013f),
-				new Vector3(-0.011f,  0.000f,  0.170f),
-				new Vector3( 0.011f,  0.000f,  0.170f)
+				new Vector3(-0.011f,  0.000f,  0.030f),
+				new Vector3( 0.011f,  0.000f,  0.030f),
+				new Vector3(-0.011f,  0.000f,  0.211f),
+				new Vector3( 0.011f,  0.000f,  0.211f)
 			};
 			mesh.triangles = new int[]
 			{
@@ -393,7 +395,7 @@ namespace Cybex.DVSuperGauges
 			};
 
 			go.GetComponent<MeshFilter>().mesh = mesh;
-			go.GetComponent<MeshRenderer>().sharedMaterial = targetMaterial;
+			go.GetComponent<MeshRenderer>().sharedMaterial = sharedMaterial;
 			go.transform.SetParent(targetObject.transform);
 			go.transform.position = level.transform.position;
 			go.transform.rotation = level.transform.rotation;

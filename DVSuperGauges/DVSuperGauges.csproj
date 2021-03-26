@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <InformationalVersion>1.0.0</InformationalVersion>
+    <InformationalVersion>1.0.1</InformationalVersion>
     <LangVersion>8.0</LangVersion>
     <DVInstallPath>C:\Program Files (x86)\Steam\steamapps\common\Derail Valley\</DVInstallPath>
   </PropertyGroup>
