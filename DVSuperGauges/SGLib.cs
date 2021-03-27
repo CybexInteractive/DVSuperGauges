@@ -130,9 +130,9 @@ namespace Cybex.DVSuperGauges
 			}
 		}
 
-		private void ExportVanillaTextures ()
+		private void ExportVanillaTextures (bool forceExport = false)
 		{
-			if (Directory.Exists(TexPath + "[Vanilla]")) return;
+			if (!forceExport && Directory.Exists(TexPath + "[Vanilla]")) return;
 			var vanDir = Directory.CreateDirectory(TexPath + "[Vanilla]");
 
 			string path;
@@ -200,14 +200,22 @@ namespace Cybex.DVSuperGauges
 
 		private void StoreVanillaTextures ()
 		{
-			van_loco_621 = CreateVanillaTextureSet(TrainCarType.LocoShunter);
-			van_loco_steam_H = CreateVanillaTextureSet(TrainCarType.LocoSteamHeavy);
-			van_LocoDiesel = CreateVanillaTextureSet(TrainCarType.LocoDiesel);
+			try
+			{
+				van_loco_621 = CreateVanillaTextureSet(TrainCarType.LocoShunter);
+				van_loco_steam_H = CreateVanillaTextureSet(TrainCarType.LocoSteamHeavy);
+				van_LocoDiesel = CreateVanillaTextureSet(TrainCarType.LocoDiesel);
 
-			van_loco_steam_H_WaterLevel = new TextureSet();
-			string path = TexPath + "[Vanilla]/loco_steam_H/";
-			ImageConversion.LoadImage(van_loco_steam_H_WaterLevel.d = new Texture2D(1024, 1024), File.ReadAllBytes(path + "waterlevel_01d.png"));
-			ImageConversion.LoadImage(van_loco_steam_H_WaterLevel.s = new Texture2D(1024, 1024), File.ReadAllBytes(path + "waterlevel_01s.png"));
+				van_loco_steam_H_WaterLevel = new TextureSet();
+				string path = TexPath + "[Vanilla]/loco_steam_H/";
+				ImageConversion.LoadImage(van_loco_steam_H_WaterLevel.d = new Texture2D(1024, 1024), File.ReadAllBytes(path + "waterlevel_01d.png"));
+				ImageConversion.LoadImage(van_loco_steam_H_WaterLevel.s = new Texture2D(1024, 1024), File.ReadAllBytes(path + "waterlevel_01s.png"));
+			}
+			catch
+			{
+				ExportVanillaTextures(true);
+				StoreVanillaTextures();
+			}
 		}
 
 		private TextureSet CreateVanillaTextureSet (TrainCarType trainCarType)
