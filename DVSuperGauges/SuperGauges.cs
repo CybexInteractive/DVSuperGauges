@@ -255,6 +255,9 @@ namespace Cybex.DVSuperGauges
 
 		private static void FixSteamerGaugeAngles (TrainCar trainCar)
 		{
+			var airBrake = UnityModManagerNet.UnityModManager.FindMod("AirBrake");
+			if (airBrake != null && airBrake.Active) return;
+
 			var interior = trainCar.interior;
 			var ig = interior.transform.Find("loco_steam_H_interior(Clone)/I brake needle pipe").GetComponent<IndicatorGauge>();
 			ig.minAngle = -316;
@@ -355,6 +358,9 @@ namespace Cybex.DVSuperGauges
 
 		private static void FixShunterGaugeAngles (TrainCar trainCar)
 		{
+			var airBrake = UnityModManagerNet.UnityModManager.FindMod("AirBrake");
+			if (airBrake != null && airBrake.Active) return;
+
 			var interiorPrefab = trainCar.interior;
 			var ig = interiorPrefab.transform.Find("loco_621_interior(Clone)/I brake_pipe_meter").GetComponent<IndicatorGauge>();
 			ig.minAngle = -277;
@@ -386,6 +392,9 @@ namespace Cybex.DVSuperGauges
 
 		private static void FixDieselGaugeAngles (TrainCar trainCar)
 		{
+			var airBrake = UnityModManagerNet.UnityModManager.FindMod("AirBrake");
+			if (airBrake != null && airBrake.Active) return;
+
 			var interior = trainCar.interior;
 			var ig = interior.transform.Find("LocoDiesel_interior(Clone)/offset/I Indicator meters/I ind_brake_res_meter").GetComponent<IndicatorGauge>();
 			ig.minAngle = -280;

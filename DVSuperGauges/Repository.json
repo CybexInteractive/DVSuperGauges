@@ -1,6 +1,10 @@
 {
-	"Releases": 
-	[
+	"Releases": [
+		{
+			"Id": "DVSuperGauges",
+			"Version": "1.0.3",
+			"DownloadUrl": "https://github.com/CybexInteractive/DVSuperGauges/releases/download/DVSG_1.0.3/DVSuperGauges_1.0.3.zip?dl=1"
+		},
 		{
 			"Id": "DVSuperGauges",
 			"Version": "1.0.2",
