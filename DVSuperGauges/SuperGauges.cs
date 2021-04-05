@@ -167,21 +167,24 @@ namespace Cybex.DVSuperGauges
 					{
 						FixShunterGaugeAngles(trainCar);
 
+						var cib = trainCar.interior.GetComponentInChildren<ShunterDashboardControls>().cabLightRotary.GetComponent<ControlImplBase>();
+						var args = new ValueChangedEventArgs(0, cib.Value);
+
+						SetShunterLitState(args);
+
 						if (Main.settings.LocoShunterTRUE)
 						{
-							SGLib.Mat_LocoShunter_Gauge.SetColor("_EmissionColor", trainCar.interior.GetComponentInChildren<ShunterDashboardControls>()
-								.cabLightRotary.GetComponent<ControlImplBase>().Value > 0 ? Color.white : Color.black);
+							// lightswitch event sub
+							cib.ValueChanged -= SetShunterLitState;
+							cib.ValueChanged += SetShunterLitState;
 
 							// set gauges material
 							trainCar.interior.Find($"loco_621_interior(Clone)/C dashboard buttons controller/I gauges backlights/lamp emmision indicator/gauge_stickers model")
 								.GetComponent<MeshRenderer>().material = SGLib.Mat_LocoShunter_Gauge;
+
 							// set needles material
 							SHUNTER_NEEDLE_TRANSFORMS.ToList().ForEach(t =>
 								trainCar.interior.Find($"loco_621_interior(Clone)/{t}").GetComponent<MeshRenderer>().material = SGLib.Mat_LocoShunter_Gauge);
-							// lightswitch event sub
-							var sdc = PlayerManager.Car.interior.GetComponentInChildren<ShunterDashboardControls>().cabLightRotary.GetComponent<ControlImplBase>();
-							sdc.ValueChanged -= SetShunterLitState;
-							sdc.ValueChanged += SetShunterLitState;
 						}
 					}));
 			}
@@ -202,23 +205,26 @@ namespace Cybex.DVSuperGauges
 
 						if (Main.settings.LocoSteamerHeavyTRUE)
 						{
+							// lightswitch event sub
+							cib.ValueChanged -= SetSteamerLitState;
+							cib.ValueChanged += SetSteamerLitState;
+							cib.ValueChanged -= RegisterSteamerCabLight;
+							cib.ValueChanged += RegisterSteamerCabLight;
+
+							// create and set waterlevel backlight material
 							if (trainCar.interior.Find("water level backlight") == null)
 								CreateSteamerWaterLevelBacklight(trainCar.interior.gameObject);
 							trainCar.interior.Find("water level backlight").GetComponent<MeshRenderer>().material = SGLib.Mat_LocoSteam_Gauge;
 
 							// set gauges material
 							trainCar.interior.Find($"loco_steam_H_interior(Clone)/Gauges").GetComponent<MeshRenderer>().material = SGLib.Mat_LocoSteam_Gauge;
+
 							// set needles material
 							STEAMER_NEEDLE_TRANSFORMS.ToList().ForEach(t =>
 								trainCar.interior.Find($"loco_steam_H_interior(Clone)/{t}").GetComponent<MeshRenderer>().material = SGLib.Mat_LocoSteam_Gauge);
-							// set waterlevels material
-							trainCar.interior.Find("loco_steam_H_interior(Clone)/I boiler water/water level").GetComponent<MeshRenderer>().material = SGLib.Mat_LocoSteam_WaterLevel;
 
-							// lightswitch event sub
-							cib.ValueChanged -= SetSteamerLitState;
-							cib.ValueChanged += SetSteamerLitState;
-							cib.ValueChanged -= RegisterSteamerCabLight;
-							cib.ValueChanged += RegisterSteamerCabLight;
+							// set waterlevel material
+							trainCar.interior.Find("loco_steam_H_interior(Clone)/I boiler water/water level").GetComponent<MeshRenderer>().material = SGLib.Mat_LocoSteam_WaterLevel;
 						}
 					}));
 			}
@@ -229,21 +235,24 @@ namespace Cybex.DVSuperGauges
 					{
 						FixDieselGaugeAngles(trainCar);
 
+						var cib = trainCar.interior.GetComponentInChildren<DieselDashboardControls>().cabLightRotary.GetComponent<ControlImplBase>();
+						var args = new ValueChangedEventArgs(0, cib.Value);
+
+						SetDieselLitState(args);
+
 						if (Main.settings.LocoDieselTRUE)
 						{
-							SGLib.Mat_LocoDiesel_Gauge.SetColor("_EmissionColor", trainCar.interior.GetComponentInChildren<DieselDashboardControls>()
-								.cabLightRotary.GetComponent<ControlImplBase>().Value > 0 ? Color.white : Color.black);
+							// lightswitch event sub
+							cib.ValueChanged -= SetDieselLitState;
+							cib.ValueChanged += SetDieselLitState;
 
 							// set gauges material
 							trainCar.interior.Find($"LocoDiesel_interior(Clone)/offset/I Indicator lamps/I gauges backlights/lamp emission indicator/gauge_labels")
 								.GetComponent<MeshRenderer>().material = SGLib.Mat_LocoDiesel_Gauge;
+
 							// set needles material
 							DIESEL_NEEDLE_TRANSFORMS.ToList().ForEach(t =>
 								trainCar.interior.Find($"LocoDiesel_interior(Clone)/{t}").GetComponent<MeshRenderer>().material = SGLib.Mat_LocoDiesel_Gauge);
-							// lightswitch event sub
-							var ddc = PlayerManager.Car.interior.GetComponentInChildren<DieselDashboardControls>().cabLightRotary.GetComponent<ControlImplBase>();
-							ddc.ValueChanged -= SetDieselLitState;
-							ddc.ValueChanged += SetDieselLitState;
 						}
 					}));
 			}
@@ -372,6 +381,7 @@ namespace Cybex.DVSuperGauges
 
 		private static void SetShunterLitState (ValueChangedEventArgs e)
 		{
+			Debug.Log($"[DV Super Gauges] Set Shunter lit state: {e.newValue}");
 			SGLib.Mat_LocoShunter_Gauge.SetColor("_EmissionColor", e.newValue > 0 ? Color.white : Color.black);
 		}
 

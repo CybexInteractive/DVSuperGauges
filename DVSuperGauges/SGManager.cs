@@ -13,6 +13,7 @@ namespace Cybex.DVSuperGauges
 		public IEnumerator ExecuteAfterInteriorLoaded (params Action[] actions)
 		{
 			yield return new WaitUntil(() => PlayerManager.Car.IsInteriorLoaded);
+			yield return null;
 			actions.ToList().ForEach(a => a.Invoke());
 			yield break;
 		}
