@@ -381,7 +381,6 @@ namespace Cybex.DVSuperGauges
 
 		private static void SetShunterLitState (ValueChangedEventArgs e)
 		{
-			Debug.Log($"[DV Super Gauges] Set Shunter lit state: {e.newValue}");
 			SGLib.Mat_LocoShunter_Gauge.SetColor("_EmissionColor", e.newValue > 0 ? Color.white : Color.black);
 		}
 
